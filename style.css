@@ -1,37 +1,37 @@
 .black { /* NGユーザのセル(ページから切り離されてるので非表示) */
-
+    
 }
 
 .gray { /* 半透明にするセル */
-  opacity: 0.3;
+    opacity: 0.3;
 }
 
 .white { /* 強調表示するセル */
-  background-color: rgba(255, 255, 0, 0.6);
-  border-radius: 8px;
+    background-color: rgba(255, 255, 0, 0.6);
+    border-radius: 8px;
 }
 
 .white .username{ /* 強調表示するセルのユーザネーム */
-  color: gray !important;
+    color: gray !important;
 }
 
 .likes-icon { /* 視聴回数とライク数 */
-  text-shadow: 0px 0px 3px black;
+    text-shadow: 0px 0px 3px black;
 }
 
 .likes-over50 .right-icon {
-  color: yellow !important;
+    color: yellow !important;
 }
 
 .likes-over100 .right-icon {
-  text-shadow: 0px 1px 2px white, 0px -1px 2px white;
-  color: red !important;
+    text-shadow: 0px 1px 2px white, 0px -1px 2px white;
+    color: red !important;
 }
 
 .likes-over200 .right-icon{
-  text-shadow: 0px 1px 2px white, 0px -1px 2px white;
-  -webkit-text-stroke: 0.5px black;
-  color: deeppink !important;
+    text-shadow: 0px 1px 2px white, 0px -1px 2px white;
+    -webkit-text-stroke: 0.5px black;
+    color: deeppink !important;
 }
 
 /*
@@ -60,19 +60,19 @@
 /*
 [data-user="ここにユーザ名を入れる"],
 [data-user="コンマで区切って何人でも可能"]{
-  box-shadow: 0px 3px 3px gray;
-  border-radius: 4px;
+    box-shadow: 0px 3px 3px gray;
+    border-radius: 4px;
 }
 */
 
 /* おまけ。コメントアウトすると、カーソル下のセルを拡大表示 */
 /*
 .node > div {
-  transition: 0.2s;
-  transform-origin: bottom;
+    transition: 0.2s;
+    transform-origin: bottom;
 }
 
 .node > div:hover {
-  transform: scale(1.5);
+    transform: scale(1.5);
 }
 */
