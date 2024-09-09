@@ -5,7 +5,8 @@
     "content_scripts": [
         {
             "matches": [
-                "http://*.iwara.tv/videos*"
+                "*://*.iwara.tv/videos*",
+                "*://*.iwara.tv/images*"
             ],
             "js": [
                 "main.js"
