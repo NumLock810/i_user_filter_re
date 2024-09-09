@@ -6,7 +6,7 @@ function save_options() {
         likeSettingsArr.push({
             like:document.getElementById("like"+i).value,
             color:document.getElementById("like_color"+i).value
-        })
+        });
     }
     chrome.storage.local.set({
         likeSettings: likeSettingsArr
