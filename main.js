@@ -49,13 +49,14 @@ function add_likes_data(cells){
             
             const target = icon;
             if(typeof target !== 'undefined'){
-                if (likes >= sortedSetting[0].like){
+                const likesNumber = likes.substr(-1) === "K" ? parseFloat(likes) * 1000 : parseInt(likes);
+                if (likesNumber >= sortedSetting[0].like){
                     cell.classList.add("likes-threshold-III");
                     target.style.color = sortedSetting[0].color;
-                } else if (likes >= sortedSetting[1].like){
+                } else if (likesNumber >= sortedSetting[1].like){
                     cell.classList.add("likes-threshold-II");
                     target.style.color = sortedSetting[1].color;
-                } else if (likes >= sortedSetting[2].like){
+                } else if (likesNumber >= sortedSetting[2].like){
                     cell.classList.add("likes-threshold-I");
                     target.style.color = sortedSetting[2].color;
                 }
