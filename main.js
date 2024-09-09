@@ -34,10 +34,13 @@ function add_likes_data(cells){
         ]
     }, (settings) => {
         const sortedSetting = settings.likeSettings.concat()
+        sortedSetting.forEach((value) => {
+            value.like = parseInt(value.like, 10);
+        });
         sortedSetting.sort((a,b) => {
             return a.like - b.like
-        })
-        sortedSetting.reverse()
+        });
+        sortedSetting.reverse();
         
         Array.from(cells).forEach((cell) => {
             const icon = cell.querySelector(".likes .icon");
