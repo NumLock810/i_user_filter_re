@@ -47,11 +47,14 @@ function add_likes_data(cells){
             const target = icon;
             if(typeof target !== 'undefined'){
                 if (likes >= sortedSetting[0].like){
-                    target.style = "text-shadow: 0px 1px 2px white, 0px -1px 2px white;-webkit-text-stroke: 0.5px black;color:"+sortedSetting[0].color+";"
+                    cell.classList.add("likes-threshold-III");
+                    target.style.color = sortedSetting[0].color;
                 } else if (likes >= sortedSetting[1].like){
-                    target.style = "text-shadow: 0px 1px 2px white, 0px -1px 2px white;color:"+sortedSetting[1].color+";"
+                    cell.classList.add("likes-threshold-II");
+                    target.style.color = sortedSetting[1].color;
                 } else if (likes >= sortedSetting[2].like){
-                    target.style.color = sortedSetting[2].color
+                    cell.classList.add("likes-threshold-I");
+                    target.style.color = sortedSetting[2].color;
                 }
             }
         })

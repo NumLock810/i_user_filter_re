@@ -19,19 +19,19 @@
     text-shadow: 0px 0px 3px black;
 }
 
-.likes-over50 .right-icon {
-    color: yellow !important;
+.likes-threshold-I .right-icon {
+    /* color: yellow !important; 色情報はjs側で設定する*/
 }
 
-.likes-over100 .right-icon {
+.likes-threshold-II .right-icon {
     text-shadow: 0px 1px 2px white, 0px -1px 2px white;
-    color: red !important;
+    /* color: red !important; 色情報はjs側で設定する*/
 }
 
-.likes-over200 .right-icon{
+.likes-threshold-III .right-icon{
     text-shadow: 0px 1px 2px white, 0px -1px 2px white;
     -webkit-text-stroke: 0.5px black;
-    color: deeppink !important;
+    /* color: deeppink !important; 色情報はjs側で設定する*/
 }
 
 /*
