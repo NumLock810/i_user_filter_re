@@ -1,12 +1,12 @@
 function save_options() {
     console.log("yea");
-    var data = {};
-    "white black gray".split(/\s/).forEach(flag=>{
+    let data = {};
+    "white black gray".split(/\s/).forEach((flag) => {
         data[flag] = document.getElementById(flag).value.trim();
     });
     
-    chrome.storage.local.set(data, function() {
-        var status = document.getElementById('status');
+    chrome.storage.local.set(data, () => {
+        const status = document.getElementById('status');
         status.textContent = 'セーブしました。';
         
         setTimeout(function() {
@@ -16,13 +16,13 @@ function save_options() {
 }
 
 function restore_options() {
-    var default_data = {
+    const default_data = {
         white: "",
         black: "",
         gray: ""
     };
     
-    chrome.storage.local.get(default_data, function(data) {
+    chrome.storage.local.get(default_data, (data) => {
         document.getElementById('white').value = data.white;
         document.getElementById('black').value = data.black;
         document.getElementById('gray').value = data.gray;

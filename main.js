@@ -1,4 +1,4 @@
-var FLAGS = ["white", "black", "gray"];
+const FLAGS = ["white", "black", "gray"];
 
 function judge(user_name, list){
     return FLAGS.find(function(flag){
@@ -9,19 +9,19 @@ function judge(user_name, list){
 }
 
 function add_flag_data(cells, list){
-    Array.from(cells).forEach(function(cell){
-        var user = cell.querySelector(".username").textContent;
+    Array.from(cells).forEach((cell) => {
+        const user = cell.querySelector(".username").textContent;
         cell.dataset.user = user;
         
-        var flag = judge(user, list);
-        if (flag)  cell.dataset.flag = flag;
+        const flag = judge(user, list);
+        if (flag) cell.dataset.flag = flag;
     });
 }
 
 function add_likes_data(cells){
-    Array.from(cells).forEach(function(cell){
-        var icon = cell.querySelector(".right-icon");
-        var likes = icon ? parseInt(icon.textContent) : 0;
+    Array.from(cells).forEach((cell) => {
+        const icon = cell.querySelector(".right-icon");
+        const likes = icon ? parseInt(icon.textContent) : 0;
         cell.dataset.likes = likes;
         
         if (likes >= 200){
@@ -35,14 +35,14 @@ function add_likes_data(cells){
 }
 
 function rebuild_cells(cells, rows){
-    Array.from(rows).forEach(function(row){
+    Array.from(rows).forEach((row) => {
         row.remove();
     })
     
-    var row_count = 0, col_count = 0;
-    var row;
+    const row_count = 0, col_count = 0;
+    let row;
     
-    Array.from(cells).forEach(function(cell){
+    Array.from(cells).forEach((cell) => {
         if (col_count % 4 == 0) {
             row_count++;
             
@@ -75,20 +75,20 @@ function rebuild_cells(cells, rows){
     cells[cells.length - 1].classList.add("views-column-last");
 }
 
-var cells = document.querySelectorAll(".views-column");
-var rows = document.querySelectorAll(".views-row");
-var root = document.querySelector(".view-content");
+const cells = document.querySelectorAll(".views-column");
+const rows = document.querySelectorAll(".views-row");
+const root = document.querySelector(".view-content");
 
-var default_data = {
+const default_data = {
     white: "",
     black: "",
     gray: ""
 };
 
-chrome.storage.local.get(default_data, function(saved){
-    var list = {};
+chrome.storage.local.get(default_data, (saved) => {
+    let list = {};
     
-    FLAGS.forEach(function(flag){
+    FLAGS.forEach((flag) => {
         var text = saved[flag].trim();
         list[flag] = text.split(/\r*\n+/);
     });
