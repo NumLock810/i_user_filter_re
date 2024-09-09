@@ -92,25 +92,40 @@ function setupMutationObserver(list) {
     const targetSelector = "#app > div.page.page-videoList > section > div > div.row";
     const videoListSelector = ".page-videoList__item"
     
-    const element = document.querySelector(targetSelector);
-    if (element) {
+    // 実際にフィルターとか掛ける関数
+    const rebuildstart = () => {
         const mo = new MutationObserver((record, observer) => {
             const cells = document.querySelectorAll(videoListSelector);
             add_flag_data(cells, list);
             rebuild_cells(cells);
             add_likes_data(cells);
         });
-        
+        const element = document.querySelector(targetSelector);
         const config = {
             childList: true,
             subtree: true,
         };
+        
         mo.observe(element, config);
     }
+    
+    // targetSelectorが追加されるまで#appの変更を監視する関数
+    const app_mo = new MutationObserver((record, observer) => {
+        if(document.querySelector(targetSelector) != null){
+            rebuildstart();
+            app_mo.disconnect();
+        }
+    });
+    const app_dom = document.querySelector("#app")
+    const app_config = {
+        childList: true,
+    };
+
+    app_mo.observe(app_dom, app_config);
 }
 
 // イベント用のコールバック
-function initializeExtension() {
+function filtering() {
     // get時にnullにならないように(わざわざ変数にする必要はない)
     const default_data = {
         white: "",
@@ -118,11 +133,19 @@ function initializeExtension() {
         gray: ""
     };
     chrome.storage.local.get(default_data, (saved) => {
-        const list = processFlags(saved);
+        const list = getUserFilter(saved);
         setupMutationObserver(list);
     });
 }
 
 
-// コールバック設定 DOMの構造が準備できたら実行される(画像読み込み前に実行されるといいな)
-document.addEventListener('DOMContentLoaded', initializeExtension);
+// "DOMContentLoaded"の発火はinteractiveが始まった瞬間 なんか読み込み早すぎてイベント登録間に合わないのでその対策
+// すでにMutationObserver周りの処理があるので，こんなことしなくても直接実行すればいいようになってると思う
+if (document.readyState === 'loading') {
+    // 読み込み中ならDOMContentLoadedで関数を実行
+    // コールバック設定 DOMの構造が準備できたら実行される(画像読み込み前に実行されるといいな)
+    document.addEventListener('DOMContentLoaded', filtering);
+} else {
+    // そうでなければ即実行
+    filtering()
+}
