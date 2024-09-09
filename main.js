@@ -1,8 +1,8 @@
 const FLAGS = ["white", "black", "gray"];
 
 function judge(user_name, list){
-    return FLAGS.find(function(flag){
-        return list[flag].some(function(pattern){
+    return FLAGS.find((flag) => {
+        return list[flag].some((pattern) => {
             return pattern && user_name.match(pattern);
         });
     });
@@ -11,73 +11,62 @@ function judge(user_name, list){
 function add_flag_data(cells, list){
     Array.from(cells).forEach((cell) => {
         const user = cell.querySelector(".username").textContent;
+        const userid = cell.querySelector(".username").href.split("/").pop()
         cell.dataset.user = user;
+        cell.dataset.userid = userid;
         
         const flag = judge(user, list);
-        if (flag) cell.dataset.flag = flag;
+        if (flag)  cell.dataset.flag = flag;
+        const idflag = judge(userid, list);
+        if (idflag)  cell.dataset.idflag = idflag;
     });
 }
 
 function add_likes_data(cells){
-    Array.from(cells).forEach((cell) => {
-        const icon = cell.querySelector(".right-icon");
-        const likes = icon ? parseInt(icon.textContent) : 0;
-        cell.dataset.likes = likes;
+    chrome.storage.local.get({
+        likeSettings: [
+            {like:50, color:"yellow"},
+            {like:100, color:"red"},
+            {like:200, color:"deeppink"},
+        ]
+    }, (settings) => {
+        const sortedSetting = settings.likeSettings.concat()
+        sortedSetting.sort((a,b) => {
+            return a.like - b.like
+        })
+        sortedSetting.reverse()
         
-        if (likes >= 200){
-            cell.classList.add("likes-over200");
-        } else if (likes >= 100){
-            cell.classList.add("likes-over100");
-        } else if (likes >= 50){
-            cell.classList.add("likes-over50");
-        }
-    });
-}
-
-function rebuild_cells(cells, rows){
-    Array.from(rows).forEach((row) => {
-        row.remove();
-    })
-    
-    const row_count = 0, col_count = 0;
-    let row;
-    
-    Array.from(cells).forEach((cell) => {
-        if (col_count % 4 == 0) {
-            row_count++;
+        Array.from(cells).forEach((cell) => {
+            const icon = cell.querySelector(".likes .icon");
+            const likes = cell.querySelector(".likes").textContent.trim();
+            cell.dataset.likes = likes;
             
-            row = document.createElement("div");
-            row.className = `views-row row views-row-${row_count}`;
-            if(row_count == 1) row.classList.add("views-row-first");
-            root.appendChild(row);
-        }
-        
-        cell.remove();
-        
-        if (cell.dataset.flag != "black"){
-            col_count++;
-            
-            var col = (col_count - 1) % 4;
-            
-            cell.className = `views-column col-sm-3 col-xs-6 views-column-${col + 1}`;
-            if (cell.dataset.flag) cell.classList.add(cell.dataset.flag);
-            
-            if(col == 0) {
-                cell.classList.add("views-row-first");
-            } else if(col == 3) {
-                cell.classList.add("views-row-last");
+            const target = icon;
+            if(typeof target !== 'undefined'){
+                if (likes >= sortedSetting[0].like){
+                    target.style = "text-shadow: 0px 1px 2px white, 0px -1px 2px white;-webkit-text-stroke: 0.5px black;color:"+sortedSetting[0].color+";"
+                } else if (likes >= sortedSetting[1].like){
+                    target.style = "text-shadow: 0px 1px 2px white, 0px -1px 2px white;color:"+sortedSetting[1].color+";"
+                } else if (likes >= sortedSetting[2].like){
+                    target.style.color = sortedSetting[2].color
+                }
             }
-            row.appendChild(cell);
-        }
+        })
     })
-    
-    rows[rows.length - 1].classList.add("views-row-last");
-    cells[cells.length - 1].classList.add("views-column-last");
 }
 
-const cells = document.querySelectorAll(".views-column");
-const rows = document.querySelectorAll(".views-row");
-const root = document.querySelector(".view-content");
+function rebuild_cells(cells){
+    Array.from(cells).forEach((cell) => {
+        if (cell.dataset.flag == "black" || cell.dataset.idflag == "black"){
+            cell.remove();
+        }
+        
+        if (cell.dataset.flag != "black" && cell.dataset.idflag != "black"){
+            if (cell.dataset.flag) cell.classList.add(cell.dataset.flag);
+            if (cell.dataset.idflag) cell.classList.add(cell.dataset.idflag);
+        }
+    })
+}
 
 const default_data = {
     white: "",
@@ -93,7 +82,31 @@ chrome.storage.local.get(default_data, (saved) => {
         list[flag] = text.split(/\r*\n+/);
     });
     
-    add_flag_data(cells, list);
-    rebuild_cells(cells, rows);
-    add_likes_data(cells); //rebuild_cellsで一旦クラスを全て消すからこれは下にする必要がある
+    const rebuildstart = () => {
+        const element = document.querySelector("#app > div.page.page-videoList > section > div > div.row");
+        const mo = new MutationObserver((record, observer) => {
+            const cells = document.querySelectorAll(".page-videoList__item");
+            add_flag_data(cells, list);
+            rebuild_cells(cells);
+            add_likes_data(cells);
+        });
+        
+        const config = {
+            childList: true,
+            subtree : true,
+        };
+        mo.observe(element, config);
+    }
+
+    const app_dom = document.querySelector("#app")
+    const app_mo = new MutationObserver((record, observer) => {
+        if(document.querySelector("#app > div.page.page-videoList > section > div > div.row") != null){
+            rebuildstart();
+            app_mo.disconnect();
+        }
+    });
+    const app_config = {
+        childList: true,
+    };
+    app_mo.observe(app_dom, app_config);
 });
