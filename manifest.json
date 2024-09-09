@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "iwara user filter:re",
+    "name": "iwara user filter:Re",
     "version": "1.0",
     "content_scripts": [
         {
