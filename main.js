@@ -1,5 +1,6 @@
 const FLAGS = ["white", "black", "gray"];
 
+// filterのリストに含まれるか判定
 function judge(user_name, list){
     return FLAGS.find((flag) => {
         return list[flag].some((pattern) => {
@@ -8,6 +9,7 @@ function judge(user_name, list){
     });
 }
 
+// filterのリストに対応するuserにflag設定
 function add_flag_data(cells, list){
     Array.from(cells).forEach((cell) => {
         const user = cell.querySelector(".username").textContent;
@@ -22,6 +24,7 @@ function add_flag_data(cells, list){
     });
 }
 
+// like数での強調のためにcssをいじる
 function add_likes_data(cells){
     chrome.storage.local.get({
         likeSettings: [
@@ -55,6 +58,7 @@ function add_likes_data(cells){
     })
 }
 
+// 非表示・半透明・強調のクラス設定
 function rebuild_cells(cells){
     Array.from(cells).forEach((cell) => {
         if (cell.dataset.flag == "black" || cell.dataset.idflag == "black"){
@@ -68,24 +72,27 @@ function rebuild_cells(cells){
     })
 }
 
-const default_data = {
-    white: "",
-    black: "",
-    gray: ""
-};
 
-chrome.storage.local.get(default_data, (saved) => {
-    let list = {};
-    
-    FLAGS.forEach((flag) => {
-        var text = saved[flag].trim();
+// filterリスト取得
+function getUserFilter(saved) {
+    const list = {};
+    FLAGS.forEach(function(flag) {
+        const text = saved[flag].trim();
         list[flag] = text.split(/\r*\n+/);
     });
+    return list;
+}
+
+// 要素監視と処理の本体
+function setupMutationObserver(list) {
+    /**** ここをいじればサイトリニューアルにも対応できるはず ****/
+    const targetSelector = "#app > div.page.page-videoList > section > div > div.row";
+    const videoListSelector = ".page-videoList__item"
     
-    const rebuildstart = () => {
-        const element = document.querySelector("#app > div.page.page-videoList > section > div > div.row");
+    const element = document.querySelector(targetSelector);
+    if (element) {
         const mo = new MutationObserver((record, observer) => {
-            const cells = document.querySelectorAll(".page-videoList__item");
+            const cells = document.querySelectorAll(videoListSelector);
             add_flag_data(cells, list);
             rebuild_cells(cells);
             add_likes_data(cells);
@@ -93,20 +100,26 @@ chrome.storage.local.get(default_data, (saved) => {
         
         const config = {
             childList: true,
-            subtree : true,
+            subtree: true,
         };
         mo.observe(element, config);
     }
+}
 
-    const app_dom = document.querySelector("#app")
-    const app_mo = new MutationObserver((record, observer) => {
-        if(document.querySelector("#app > div.page.page-videoList > section > div > div.row") != null){
-            rebuildstart();
-            app_mo.disconnect();
-        }
-    });
-    const app_config = {
-        childList: true,
+// イベント用のコールバック
+function initializeExtension() {
+    // get時にnullにならないように(わざわざ変数にする必要はない)
+    const default_data = {
+        white: "",
+        black: "",
+        gray: ""
     };
-    app_mo.observe(app_dom, app_config);
-});
+    chrome.storage.local.get(default_data, (saved) => {
+        const list = processFlags(saved);
+        setupMutationObserver(list);
+    });
+}
+
+
+// コールバック設定 DOMの構造が準備できたら実行される(画像読み込み前に実行されるといいな)
+document.addEventListener('DOMContentLoaded', initializeExtension);
